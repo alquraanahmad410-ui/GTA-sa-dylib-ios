@@ -1,0 +1,9 @@
+Package: com.local.gtasamenu
+Name: GTASA Mod Menu
+Depends: mobilesubstrate
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Single-player mod menu for GTA San Andreas
+Maintainer: me
+Author: me
+Section: Tweaks
