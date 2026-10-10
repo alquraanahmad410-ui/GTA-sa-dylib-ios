@@ -1,0 +1,34 @@
+name: Build GTASAMenu dylib
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  dylib:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build standalone dylib (no Substrate, for LiveContainer)
+        run: |
+          mkdir -p out
+          xcrun --sdk iphoneos clang -dynamiclib \
+            -arch arm64 -miphoneos-version-min=14.0 \
+            -fobjc-arc -O2 -Wno-deprecated-declarations \
+            -framework UIKit -framework Foundation \
+            Tweak.m -o out/GTASAMenu.dylib
+          codesign -f -s - out/GTASAMenu.dylib
+          echo "--- linked libraries ---"
+          otool -L out/GTASAMenu.dylib
+          if otool -L out/GTASAMenu.dylib | grep -qi substrate; then
+            echo "ERROR: dylib depends on Substrate"; exit 1
+          fi
+          file out/GTASAMenu.dylib
+
+      - name: Upload dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: GTASAMenu-dylib
+          path: out/GTASAMenu.dylib
